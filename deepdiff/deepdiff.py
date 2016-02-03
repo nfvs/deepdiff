@@ -211,7 +211,7 @@ class DeepDiff(dict):
                      "values_changed": [], "unprocessed": [], "iterable_item_added": [], "iterable_item_removed": [],
                      "attribute_added": [], "attribute_removed": [], "set_item_removed": [], "set_item_added": []})
 
-        self.__diff(t1, t2, parents_ids=frozenset({id(t1)}))
+        self.__diff(t1, t2, parents_ids=frozenset(set([id(t1)])))
 
         empty_keys = [k for k, v in getattr(self, items)() if not v]
 
@@ -224,7 +224,7 @@ class DeepDiff(dict):
         Dealing with python unicode issues.
         '''
         try:
-            obj = u"%s: {}=%s ===> {}=%s".format(t1, t2)
+            obj = u"%s: {0}=%s ===> {1}=%s".format(t1, t2)
         except (UnicodeDecodeError, UnicodeEncodeError):
             if isinstance(t1, (str, unicode)) and isinstance(t2, (str, unicode)):
                 try:
@@ -258,7 +258,7 @@ class DeepDiff(dict):
                         t2 = 'Unable to Encode/Decode'
 
             try:
-                obj = u"%s: {}=%s ===> {}=%s".format(t1, t2)
+                obj = u"%s: {0}=%s ===> {1}=%s".format(t1, t2)
             except (UnicodeDecodeError, UnicodeEncodeError):
                 obj = "%s: Unable to Encode/Decode=%s ===> Unable to Encode/Decode=%s"
 
@@ -280,8 +280,8 @@ class DeepDiff(dict):
             t2 = t2.__dict__
         except AttributeError:
             try:
-                t1 = {i: getattr(t1, i) for i in t1.__slots__}
-                t2 = {i: getattr(t2, i) for i in t2.__slots__}
+                t1 = dict([(i, getattr(t1, i)) for i in t1.__slots__])
+                t2 = dict([(i, getattr(t2, i)) for i in t2.__slots__])
             except AttributeError:
                 self['unprocessed'].append("%s: %s and %s" % (parent, t1, t2))
                 return
